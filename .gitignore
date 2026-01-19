@@ -1,0 +1,13 @@
+# Binari di Go
+generator
+generator.exe
+bin/
+
+# Dipendenze e file temporanei
+dist/
+data/
+.air.toml
+
+# OS specific
+.DS_Store
+Thumbs.db

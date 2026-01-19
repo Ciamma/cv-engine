@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @page {
+            size: A4;
+            margin: 10mm;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: white;
+        }
+
+        .europass-blue {
+            color: #004494;
+        }
+
+        .europass-border {
+            border-left: 1.5pt solid #004494;
+        }
+
+        .section-title {
+            font-size: 11pt;
+            font-weight: bold;
+            text-transform: uppercase;
+            color: #004494;
+            margin-bottom: 5mm;
+        }
+
+        .label-col {
+            width: 30%;
+            padding-right: 5mm;
+            text-align: right;
+            font-size: 9pt;
+            color: #666;
+            font-weight: bold;
+        }
+
+        .content-col {
+            width: 70%;
+            padding-left: 5mm;
+            border-left: 0.5pt solid #ddd;
+            font-size: 10pt;
+        }
+
+        .entry {
+            margin-bottom: 4mm;
+            display: flex;
+        }
+    </style>
+</head>
+
+<body class="p-4">
+    <div class="flex mb-10">
+        <div class="label-col">
+            <h1 class="text-3xl font-light europass-blue uppercase">{{.NomeCompleto}} </h1>
+            <p class="text-lg text-gray-500 mb-3">{{.Posizione}}</p>
+            {{if .Abitazione}}<p>📍 {{.Abitazione}}</p>{{end}}
+            {{if .Email}}<p>📧 {{.Email}}</p>{{end}}
+            {{if .Linkedin}}<p>🔗 {{.Linkedin}}</p>{{end}}
+        </div>
+        <div class="content-col">
+            <div class="prose max-w-none 
+                            [&_h2]:text-[11pt] [&_h2]:font-bold [&_h2]:europass-blue [&_h2]:uppercase [&_h2]:mt-6 [&_h2]:mb-2
+                            [&_h3]:text-[10pt] [&_h3]:font-bold [&_h3]:text-gray-800
+                            [&_p]:mb-2 [&_ul]:list-disc [&_ul]:ml-4">
+                {{.Content}}
+            </div>
+        </div>
+    </div>
+
+
+    <!-- <div class="entry">
+
+
+    </div> -->
+
+    <div class="entry">
+        <div class="label-col uppercase">Competenze Tecniche</div>
+        <div class="content-col">
+            {{range $area, $skills := .SkillsPerArea}}
+            <div class="mb-2">
+                <span class="font-bold text-gray-700 uppercase text-[8pt]">{{$area}}:</span>
+                <span class="text-gray-600">
+                    {{$length := len $skills}}{{range $i, $s := $skills}}{{$s}}{{if lt (add $i 1) $length}},
+                    {{end}}{{end}}
+                </span>
+            </div>
+            {{end}}
+        </div>
+    </div>
+
+
+    <div class="entry mt-6">
+        <div class="label-col uppercase">Lingue</div>
+        <div class="content-col">
+            {{range .Lingue}}
+            <div class="mb-4">
+                <p class="font-bold text-gray-800 border-b mb-2">{{.Lingua}}</p>
+
+                <div class="grid grid-cols-5 gap-1 text-[7pt] text-center uppercase text-gray-500 font-bold mb-1">
+                    <div>Ascolto</div>
+                    <div>Lettura</div>
+                    <div>Interazione</div>
+                    <div>Produzione</div>
+                    <div>Scrittura</div>
+                </div>
+                <div class="grid grid-cols-5 gap-1 text-center font-bold text-indigo-700">
+                    <div class="bg-gray-100 py-1 rounded">{{.Ascolto}}</div>
+                    <div class="bg-gray-100 py-1 rounded">{{.Lettura}}</div>
+                    <div class="bg-gray-100 py-1 rounded">{{.Interazione}}</div>
+                    <div class="bg-gray-100 py-1 rounded">{{.ProduzioneOrale}}</div>
+                    <div class="bg-gray-100 py-1 rounded">{{.Scrittura}}</div>
+                </div>
+                <p class="text-[6pt] text-gray-400 mt-1 italic text-right">Livelli: A1/2: Base - B1/2: Intermedio -
+                    C1/2:
+                    Avanzato</p>
+            </div>
+            {{end}}
+        </div>
+    </div>
+</body>
+
+</html>

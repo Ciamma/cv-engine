@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>{{.Nome}} - Curriculum</title>
+</head>
+
+<body class="bg-slate-50 font-sans antialiased text-gray-900">
+
+    <header class="sticky top-0 z-50 bg-white border-b shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 py-2 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="text-center md:text-left">
+                <div class="flex flex-row gap-x-2">
+                    <h1 class="text-3xl font-extrabold text-indigo-700 tracking-tight">{{.Nome}}</h1>
+                    <h1 class="text-3xl font-extrabold text-black tracking-tight">{{.Cognome}}</h1>
+                </div>
+                <p class="text-sm font-medium text-slate-500 uppercase tracking-widest">{{.Posizione}}</p>
+            </div>
+
+            <div class="flex flex-col items-center md:items-end gap-1 text-sm text-slate-600 font-medium">
+                <div class="flex flex-col items-center md:items-end gap-3 md:gap-0">
+                    <span class="flex items-center gap-1">📍 {{.Nazionalita}}</span>
+                    <div>
+                        {{range .LingueSito}}
+                        <span class="text-slate-400 italic">🗣️ {{.}}</span>
+                        {{end}}
+                    </div>
+                </div>
+                <a href="{{.Linkedin}}" target="_blank"
+                    class="text-indigo-600 hover:text-indigo-800 flex items-center gap-1 transition font-bold">
+                    🔗 LinkedIn
+                </a>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col justify-between items-center gap-2">
+            <!-- <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 md:p-8"> -->
+            <h4 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                🚀 Top Skills
+            </h4>
+            <div class="flex flex-wrap gap-2">
+                {{range .TopSkills}}
+                <span
+                    class="px-3 py-1 bg-indigo-50 text-indigo-700 rounded-full text-sm font-semibold border border-indigo-100">
+                    {{.}}
+                </span>
+                {{end}}
+            </div>
+            <!-- </section> -->
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-10 space-y-8">
+
+        <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 md:p-8">
+
+            <article class="max-w-none text-slate-700 leading-relaxed 
+                        [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:text-slate-800 [&_h2]:mt-8 [&_h2]:mb-4 [&_h2]:border-b [&_h2]:pb-2
+                        [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:text-indigo-600 [&_h3]:mt-6
+                        [&_ul]:list-disc [&_ul]:ml-5 [&_ul]:space-y-2 [&_ul]:mt-4
+                        [&_p]:mt-4 [&_strong]:text-slate-900">
+                {{.Content}}
+            </article>
+        </section>
+
+        <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 md:p-8">
+            <h2 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2 border-b pb-2">
+                🛠️ Competenze Tecniche
+            </h2>
+            <div class="space-y-1">
+                {{range $area, $skills := .SkillsPerArea}}
+                <div class="flex flex-row md:items-start gap-1 md:gap-3">
+                    <span class="font-bold text-indigo-600 text-xs uppercase tracking-widest py-1 shrink-0">
+                        {{$area}}:
+                    </span>
+                    <div class="flex flex-wrap gap-x-2 gap-y-1">
+                        {{$length := len $skills}}
+                        {{range $index, $element := $skills}}
+                        <span class="text-slate-600 text-sm">
+                            {{$element}}{{if lt (add $index 1) $length}},{{end}}
+                        </span>
+                        {{end}}
+                    </div>
+                </div>
+                {{end}}
+            </div>
+        </section>
+
+        <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+            <h2 class="text-xl font-bold text-slate-800 mb-6 border-b pb-2">🗣️ Lingue</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {{range .Lingue}}
+                <div class="border rounded-lg p-4 bg-slate-50">
+                    <h3 class="font-bold text-indigo-700 mb-3">{{.Lingua}}</h3>
+                    <div class="grid grid-cols-5 gap-2 text-center">
+                        {{$levels := .}}
+                        <div class="flex flex-col"><span
+                                class="text-[10px] text-slate-400 uppercase">Ascolto</span><span
+                                class="font-bold text-sm">{{.Ascolto}}</span></div>
+                        <div class="flex flex-col"><span
+                                class="text-[10px] text-slate-400 uppercase">Lettura</span><span
+                                class="font-bold text-sm">{{.Lettura}}</span></div>
+                        <div class="flex flex-col"><span
+                                class="text-[10px] text-slate-400 uppercase">Interazione</span><span
+                                class="font-bold text-sm">{{.Interazione}}</span></div>
+                        <div class="flex flex-col"><span class="text-[10px] text-slate-400 uppercase">Orale</span><span
+                                class="font-bold text-sm">{{.ProduzioneOrale}}</span></div>
+                        <div class="flex flex-col"><span
+                                class="text-[10px] text-slate-400 uppercase">Scrittura</span><span
+                                class="font-bold text-sm">{{.Scrittura}}</span></div>
+                    </div>
+                </div>
+                {{end}}
+            </div>
+        </section>
+
+        <div class="flex justify-center pt-6">
+            <a href="curriculum.pdf" download="CV_{{.Nome}}_{{.Cognome}}.pdf"
+                class="group relative flex items-center gap-3 bg-slate-900 text-white px-8 py-4 rounded-full font-bold shadow-xl hover:bg-indigo-600 transition-all duration-300 transform hover:-translate-y-1">
+                ⬇️ Scarica Curriculum PDF
+            </a>
+        </div>
+
+    </main>
+
+    <footer class="text-center py-10 text-slate-400 text-xs">
+        Generato con Go + Tailwind CSS • 2026
+    </footer>
+
+</body>
+
+</html>
