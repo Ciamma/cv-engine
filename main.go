@@ -77,27 +77,26 @@ func (t *TemplateRenderer) Render(w io.Writer, name string, data interface{}, c 
 
 func exportStatic() {
     cv, _ := loadCV()
-    
-    // 1. Prepariamo la cartella di output
-    os.MkdirAll("dist", 0755)
-
-    // 2. Generiamo l'HTML del sito
     tmpl := template.Must(template.New("").Funcs(template.FuncMap{
         "add": func(a, b int) int { return a + b },
     }).ParseGlob("templates/*.html"))
-    
-    f, _ := os.Create("dist/index.html")
-    tmpl.ExecuteTemplate(f, "index.html", cv)
-    f.Close()
 
-    // Nota: Il PDF reale verrà generato dall'Action di GitHub 
-    // usando uno strumento chiamato 'PrinceXML' o 'Playwright' 
-    // che trasformerà il tuo pdf.html in un vero PDF.
-    
-    // Per ora esportiamo anche il template pdf come html pronto per essere convertito
-    fPDF, _ := os.Create("dist/pdf-to-convert.html")
+    // Crea cartella dist
+    os.MkdirAll("dist/static", 0755)
+
+    // 1. Genera Index
+    fIndex, _ := os.Create("dist/index.html")
+    tmpl.ExecuteTemplate(fIndex, "index.html", cv)
+    fIndex.Close()
+
+    // 2. Genera il file per il PDF
+    fPDF, _ := os.Create("dist/pdf.html")
     tmpl.ExecuteTemplate(fPDF, "pdf.html", cv)
     fPDF.Close()
+
+    // 3. Copia i file statici (CSS, Immagini)
+    // Se usi Linux (GitHub Actions), questo è il modo più veloce:
+    exec.Command("cp", "-r", "static/.", "dist/static/").Run()
 }
 
 func main() {
