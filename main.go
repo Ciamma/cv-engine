@@ -96,7 +96,10 @@ func exportStatic() {
 
     // 3. Copia i file statici (CSS, Immagini)
     // Se usi Linux (GitHub Actions), questo è il modo più veloce:
-    exec.Command("cp", "-r", "static/.", "dist/static/").Run()
+    err := exec.Command("cp", "-r", "static/.", "dist/static/").Run()
+	if err != nil {
+    	fmt.Printf("Nota: Copia statici saltata o fallita: %v\n", err)
+	}
 }
 
 func main() {
