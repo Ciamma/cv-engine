@@ -1,0 +1,42 @@
+name: Deploy CV
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch: # Permette di lanciarlo a mano
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21' # O la tua versione
+
+      - name: Clone Private Data
+        run: |
+          git clone https://${{ secrets.DATA_REPO_TOKEN }}@github.com/TUO_UTENTE/my-cv-data.git data
+
+      - name: Build and Export Static Files
+        run: |
+          go mod tidy
+          go run main.go -export
+
+      - name: Generate PDF from HTML
+        # Usiamo un tool pronto per convertire l'HTML in PDF
+        uses: pagedjs/pagedjs-action@v1
+        with:
+          html: dist/pdf-to-convert.html
+          pdf: dist/curriculum.pdf
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
