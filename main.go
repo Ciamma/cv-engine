@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"flag"
 	"html/template"
 	"io"
 	"net/http"
@@ -46,7 +47,7 @@ type CVData struct {
 
 // Funzione per leggere e processare il file MD
 func loadCV() (CVData, error) {
-	file, err := os.ReadFile("data/cvv.md")
+	file, err := os.ReadFile("data/cv.md")
 	if err != nil {
 		return CVData{}, err
 	}
@@ -77,63 +78,73 @@ func (t *TemplateRenderer) Render(w io.Writer, name string, data interface{}, c 
 }
 
 func exportStatic() {
-    cv, _ := loadCV()
-    tmpl := template.Must(template.New("").Funcs(template.FuncMap{
-        "add": func(a, b int) int { return a + b },
-    }).ParseGlob("templates/*.html"))
-
-    // Crea cartella dist
-    os.MkdirAll("dist/static", 0755)
-
-    // 1. Genera Index
-    fIndex, _ := os.Create("dist/index.html")
-    tmpl.ExecuteTemplate(fIndex, "index.html", cv)
-    fIndex.Close()
-
-    // 2. Genera il file per il PDF
-    fPDF, _ := os.Create("dist/pdf.html")
-    tmpl.ExecuteTemplate(fPDF, "pdf.html", cv)
-    fPDF.Close()
-
-    // 3. Copia i file statici (CSS, Immagini)
-    // Se usi Linux (GitHub Actions), questo è il modo più veloce:
-    err := exec.Command("cp", "-r", "static/.", "dist/static/").Run()
+	fmt.Println("🚀 Avvio esportazione statica...")
+	cv, err := loadCV()
 	if err != nil {
-    	fmt.Printf("Nota: Copia statici saltata o fallita: %v\n", err)
+		fmt.Printf("❌ Errore caricamento dati: %v\n", err)
+		return
 	}
+
+	tmpl := template.Must(template.New("").Funcs(template.FuncMap{
+		"add": func(a, b int) int { return a + b },
+	}).ParseGlob("templates/*.html"))
+
+	os.MkdirAll("dist/static", 0755)
+
+	fIndex, _ := os.Create("dist/index.html")
+	tmpl.ExecuteTemplate(fIndex, "index.html", cv)
+	fIndex.Close()
+
+	fPDF, _ := os.Create("dist/pdf.html")
+	tmpl.ExecuteTemplate(fPDF, "pdf.html", cv)
+	fPDF.Close()
+
+	err = exec.Command("cp", "-r", "static/.", "dist/static/").Run()
+	if err != nil {
+		fmt.Printf("⚠️ Nota: Copia statici fallita (normale su Windows): %v\n", err)
+	}
+	fmt.Println("✅ Esportazione completata nella cartella /dist")
 }
 
 func main() {
-    e := echo.New()
+	// 1. Definiamo il flag -export
+	exportMode := flag.Bool("export", false, "Esegue l'esportazione statica e termina")
+	flag.Parse()
 
-    // Renderer migliorato
-    renderer := &TemplateRenderer{
-        templates: template.New("").Funcs(template.FuncMap{
-            "add": func(a, b int) int { return a + b },
-        }),
-    }
-    
-    // Carichiamo i template esplicitamente
-    _, err := renderer.templates.ParseGlob("templates/*.html")
-    if err != nil {
-        e.Logger.Fatal("Errore caricamento template:", err)
-    }
-    
-    e.Renderer = renderer
+	// 2. Se il flag è presente, eseguiamo l'export e USCIAMO
+	if *exportMode {
+		exportStatic()
+		return
+	}
 
-    e.Static("/static", "static")
+	// 3. Altrimenti, avviamo il server normalmente per lo sviluppo locale
+	e := echo.New()
 
-    e.GET("/", func(c echo.Context) error {
-        cv, err := loadCV()
-        if err != nil { return err }
-        return c.Render(http.StatusOK, "index.html", cv)
-    })
-    
-    e.GET("/pdf", func(c echo.Context) error {
-        cv, err := loadCV()
-        if err != nil { return err }
-        return c.Render(http.StatusOK, "pdf.html", cv)
-    })
+	renderer := &TemplateRenderer{
+		templates: template.New("").Funcs(template.FuncMap{
+			"add": func(a, b int) int { return a + b },
+		}),
+	}
 
-    e.Logger.Fatal(e.Start(":8080"))
+	_, err := renderer.templates.ParseGlob("templates/*.html")
+	if err != nil {
+		e.Logger.Fatal("Errore caricamento template:", err)
+	}
+
+	e.Renderer = renderer
+	e.Static("/static", "static")
+
+	e.GET("/", func(c echo.Context) error {
+		cv, err := loadCV()
+		if err != nil { return err }
+		return c.Render(http.StatusOK, "index.html", cv)
+	})
+
+	e.GET("/pdf", func(c echo.Context) error {
+		cv, err := loadCV()
+		if err != nil { return err }
+		return c.Render(http.StatusOK, "pdf.html", cv)
+	})
+
+	e.Logger.Fatal(e.Start(":8080"))
 }
