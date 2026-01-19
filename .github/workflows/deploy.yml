@@ -40,7 +40,7 @@ jobs:
 
       - name: Generate PDF
         # Usiamo --no-sandbox perché siamo in un container Docker/GitHub Action
-        run: pagedjs-cli dist/pdf.html -o dist/curriculum.pdf --no-sandbox
+        run: pagedjs-cli dist/pdf.html -o dist/curriculum.pdf --browserArgs --no-sandbox
 
       - name: Upload Artifact
         uses: actions/upload-pages-artifact@v3
