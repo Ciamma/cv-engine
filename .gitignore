@@ -2,6 +2,7 @@
 generator
 generator.exe
 bin/
+tmp/
 
 # Dipendenze e file temporanei
 dist/
