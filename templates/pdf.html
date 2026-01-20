@@ -7,120 +7,175 @@
     <style>
         @page {
             size: A4;
-            margin: 10mm;
+            margin: 15mm 10mm;
+            /* Aumentato margine superiore/inferiore */
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', Helvetica, Arial, sans-serif;
             background: white;
+            line-height: 1.4;
+            color: #333;
+        }
+
+        /* Griglia principale per coerenza verticale */
+        .cv-grid {
+            display: grid;
+            grid-template-columns: 32% 1px 68%;
+            /* 1px è la linea di separazione */
+            gap: 0;
+            width: 100%;
+        }
+
+        .label-col {
+            padding-right: 8mm;
+            text-align: center;
+            font-size: 9pt;
+            color: #555;
+            word-wrap: break-word;
+            /* Evita che link lunghi escano dai bordi */
+        }
+
+        .separator-col {
+            background-color: #ddd;
+            height: 100%;
+        }
+
+        .content-col {
+            padding-left: 8mm;
+            font-size: 10pt;
+            padding-bottom: 6mm;
+        }
+
+        /* Titoli Sezioni */
+        .section-title {
+            font-size: 11pt;
+            font-weight: bold;
+            text-transform: uppercase;
+            color: #004494;
+            margin-top: 8mm;
+            margin-bottom: 4mm;
+        }
+
+        /* Evita che i blocchi si rompano tra le pagine */
+        .avoid-break {
+            page-break-inside: avoid;
+            break-inside: avoid;
         }
 
         .europass-blue {
             color: #004494;
         }
 
-        .europass-border {
-            border-left: 1.5pt solid #004494;
+        /* Correzione per liste nel Markdown (.Content) */
+        .prose ul {
+            list-style-type: disc;
+            margin-left: 1.2rem;
+            margin-top: 0.5rem;
         }
 
-        .section-title {
-            font-size: 11pt;
-            font-weight: bold;
-            text-transform: uppercase;
-            color: #004494;
-            margin-bottom: 5mm;
+        .prose li {
+            margin-bottom: 0.2rem;
+            padding-left: 0.3rem;
         }
 
-        .label-col {
-            width: 30%;
-            padding-right: 5mm;
-            text-align: right;
-            font-size: 9pt;
-            color: #666;
-            font-weight: bold;
+        .prose h3 {
+            margin-top: 1rem;
+            color: #111;
+            font-weight: 700;
         }
 
-        .content-col {
-            width: 70%;
-            padding-left: 5mm;
-            border-left: 0.5pt solid #ddd;
-            font-size: 10pt;
-        }
-
-        .entry {
-            margin-bottom: 4mm;
-            display: flex;
+        /* Gestione link e testi lunghi */
+        .break-all {
+            word-break: break-all;
         }
     </style>
 </head>
 
-<body class="p-4">
-    <div class="flex mb-10">
+<body>
+    <div class="cv-grid mb-8">
         <div class="label-col">
-            <h1 class="text-3xl font-light europass-blue uppercase">{{.NomeCompleto}} </h1>
-            <p class="text-lg text-gray-500 mb-3">{{.Posizione}}</p>
-            {{if .Abitazione}}<p>📍 {{.Abitazione}}</p>{{end}}
-            {{if .Email}}<p>📧 {{.Email}}</p>{{end}}
-            {{if .Linkedin}}<p>🔗 {{.Linkedin}}</p>{{end}}
-        </div>
-        <div class="content-col">
-            <div class="prose max-w-none 
-                            [&_h2]:text-[11pt] [&_h2]:font-bold [&_h2]:europass-blue [&_h2]:uppercase [&_h2]:mt-6 [&_h2]:mb-2
-                            [&_h3]:text-[10pt] [&_h3]:font-bold [&_h3]:text-gray-800
-                            [&_p]:mb-2 [&_ul]:list-disc [&_ul]:ml-4">
-                {{.Content}}
+            <h1 class="text-2xl font-semibold text-left europass-blue titlecase leading-tight">{{.NomeCompleto}}</h1>
+            <p class="text-sm font-semibold text-left text-gray-500 mb-4">{{.Posizione}}</p>
+            {{if .DataNascita}}<p class="text-sm font-semibold europass-blue">Data di Nascita: <span
+                    class="text-gray-500">{{.DataNascita}}</span></p>{{end}}
+            <div class="grid grid-cols-1 gap-1 text-sm pt-4">
+                {{if .Nazionalita}}<p>🌍 {{.Nazionalita}}</p>{{end}}
+                {{if .Abitazione}}<p>📍 {{.Abitazione}}</p>{{end}}
+                {{if .Email}}<p>📧 <span class="break-all">{{.Email}}</span></p>{{end}}
+                {{if .Telefono}}<p>📞 <span class="break-all">{{.Telefono}}</span></p>{{end}}
+                {{if .Linkedin}}<p>🔗 <span class="break-all text-blue-700">{{.Linkedin}}</span></p>{{end}}
+                </div>
             </div>
+            <div class="separator-col"></div>
+            <div class="content-col">
+                <div class="prose max-w-none 
+                                        [&_h2]:text-[10pt] [&_h2]:font-bold [&_h2]:text-[#004494] [&_h2]:uppercase [&_h2]:border-b [&_h2]:pb-1 [&_h2]:mt-2 [&_h2]:mb-4
+                                        [&_h3]:text-[9pt] [&_h3]:font-medium [&_h3]:text-gray-800 [&_h3]:mb-1
+                                        [&_h4]:text-[8pt] [&_h4]:ml-4 ">
+                    {{.Content}}
+                </div>
+            </div>
+            </div>
+            
+            <!-- <div class="cv-grid">
+                                                                                                                                                                                                                                                                                                                <div class="label-col">
+                                                                                                                                                                                                                                                                                                                </div>
+                                                                                                                                                                                                                                                                                                                <div class="separator-col"></div>
+                                                                                                                                                                                                                                                                                                        <div class="content-col">
+                                                                                                                                                                                                                                                                                                
         </div>
-    </div>
-
-
-    <!-- <div class="entry">
-
-
     </div> -->
 
-    <div class="entry">
-        <div class="label-col uppercase">Competenze Tecniche</div>
+    <div class="cv-grid avoid-break">
+        <div class="label-col">
+            <h2 class="section-title">Competenze Tecniche</h2>
+        </div>
+        <div class="separator-col"></div>
         <div class="content-col">
-            {{range $area, $skills := .SkillsPerArea}}
-            <div class="mb-2">
-                <span class="font-bold text-gray-700 uppercase text-[8pt]">{{$area}}:</span>
-                <span class="text-gray-600">
-                    {{$length := len $skills}}{{range $i, $s := $skills}}{{$s}}{{if lt (add $i 1) $length}},
-                    {{end}}{{end}}
-                </span>
+            <div class="mt-8"> {{range $area, $skills := .SkillsPerArea}}
+                <div class="mb-3">
+                    <span class="font-bold text-gray-700 uppercase text-[8pt] block">{{$area}}</span>
+                    <span class="text-gray-600">
+                        {{$length := len $skills}}{{range $i, $s := $skills}}{{$s}}{{if lt (add $i 1) $length}},
+                        {{end}}{{end}}
+                    </span>
+                </div>
+                {{end}}
             </div>
-            {{end}}
         </div>
     </div>
 
-
-    <div class="entry mt-6">
-        <div class="label-col uppercase">Lingue</div>
+    <div class="cv-grid avoid-break">
+        <div class="label-col">
+            <h2 class="section-title">Lingue</h2>
+        </div>
+        <div class="separator-col"></div>
         <div class="content-col">
-            {{range .Lingue}}
-            <div class="mb-4">
-                <p class="font-bold text-gray-800 border-b mb-2">{{.Lingua}}</p>
+            <div class="mt-8">
+                {{range .Lingue}}
+                <div class="mb-6">
+                    <p class="font-bold text-gray-800 mb-2 uppercase">{{.Lingua}}</p>
 
-                <div class="grid grid-cols-5 gap-1 text-[7pt] text-center uppercase text-gray-500 font-bold mb-1">
-                    <div>Ascolto</div>
-                    <div>Lettura</div>
-                    <div>Interazione</div>
-                    <div>Produzione</div>
-                    <div>Scrittura</div>
+                    <div class="grid grid-cols-5 gap-1 text-[7pt] text-center uppercase text-gray-500 font-bold mb-1">
+                        <div>Ascolto</div>
+                        <div>Lettura</div>
+                        <div>Interazione</div>
+                        <div>Produzione</div>
+                        <div>Scrittura</div>
+                    </div>
+                    <div class="grid grid-cols-5 gap-1 text-center font-bold text-blue-800">
+                        <div class="bg-blue-50 py-1 border border-blue-100 rounded">{{.Ascolto}}</div>
+                        <div class="bg-blue-50 py-1 border border-blue-100 rounded">{{.Lettura}}</div>
+                        <div class="bg-blue-50 py-1 border border-blue-100 rounded">{{.Interazione}}</div>
+                        <div class="bg-blue-50 py-1 border border-blue-100 rounded">{{.ProduzioneOrale}}</div>
+                        <div class="bg-blue-50 py-1 border border-blue-100 rounded">{{.Scrittura}}</div>
+                    </div>
                 </div>
-                <div class="grid grid-cols-5 gap-1 text-center font-bold text-indigo-700">
-                    <div class="bg-gray-100 py-1 rounded">{{.Ascolto}}</div>
-                    <div class="bg-gray-100 py-1 rounded">{{.Lettura}}</div>
-                    <div class="bg-gray-100 py-1 rounded">{{.Interazione}}</div>
-                    <div class="bg-gray-100 py-1 rounded">{{.ProduzioneOrale}}</div>
-                    <div class="bg-gray-100 py-1 rounded">{{.Scrittura}}</div>
+                {{end}}
+                <p class="text-[7pt] text-gray-400 mt-1 italic">Livelli: A1/2: Base - B1/2: Intermedio - C1/2: Avanzato
+                </p>
                 </div>
-                <p class="text-[6pt] text-gray-400 mt-1 italic text-right">Livelli: A1/2: Base - B1/2: Intermedio -
-                    C1/2:
-                    Avanzato</p>
-            </div>
-            {{end}}
         </div>
     </div>
 </body>

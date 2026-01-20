@@ -28,7 +28,7 @@ type LivelliLingua struct {
 type CVData struct {
 	Nome           string              `yaml:"nome"`
 	Cognome	       string              `yaml:"cognome"`
-	DataNascita    string              `yaml:"data_nascita"`
+	DataNascita    string              `yaml:"dataNascita"`
 	Sesso		   string              `yaml:"sesso"`
 	Posizione      string              `yaml:"posizione"`
 	Abitazione     string              `yaml:"abitazione"`
