@@ -23,6 +23,7 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: '1.21'
+          cache: true
 
       - name: Build Static Site
         run: |
@@ -34,9 +35,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
 
       - name: Install Paged.js CLI
-        run: npm install -g pagedjs-cli
+        run: |
+          if [ ! -f node_modules/.bin/pagedjs-cli ]; then
+            npm install pagedjs-cli
+          fi
 
       - name: Generate PDF
         # Usiamo --no-sandbox perché siamo in un container Docker/GitHub Action
