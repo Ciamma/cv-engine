@@ -16,13 +16,13 @@ jobs:
       - name: Checkout Engine
         uses: actions/checkout@v4
 
+      - name: Clone Private Data
+        run: git clone https://${{ secrets.PAT_TOKEN }}@github.com/Ciamma/my-cv-data.git data
+
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
           go-version: '1.21'
-
-      - name: Clone Private Data
-        run: git clone https://${{ secrets.PAT_TOKEN }}@github.com/Ciamma/my-cv-data.git data
 
       - name: Build Static Site
         run: |
