@@ -35,13 +35,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
 
       - name: Install Paged.js CLI
-        run: |
-          if [ ! -f node_modules/.bin/pagedjs-cli ]; then
-            npm install pagedjs-cli
-          fi
+        run: npm install pagedjs-cli --no-package-lock
 
       - name: Generate PDF
         # Usiamo --no-sandbox perché siamo in un container Docker/GitHub Action
