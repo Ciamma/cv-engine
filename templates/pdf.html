@@ -28,7 +28,7 @@
         }
 
         .label-col {
-            padding-right: 8mm;
+            padding-right: 8px;
             text-align: center;
             font-size: 9pt;
             color: #555;
@@ -93,39 +93,80 @@
 </head>
 
 <body>
-    <div class="cv-grid mb-8">
+    <!-- Blocco Dati Personali ed Esperienze lavorative -->
+    <div class="cv-grid">
         <div class="label-col">
             <h1 class="text-2xl font-semibold text-left europass-blue titlecase leading-tight">{{.NomeCompleto}}</h1>
             <p class="text-sm font-semibold text-left text-gray-500 mb-4">{{.Posizione}}</p>
             {{if .DataNascita}}<p class="text-sm font-semibold europass-blue">Data di Nascita: <span
                     class="text-gray-500">{{.DataNascita}}</span></p>{{end}}
-            <div class="grid grid-cols-1 gap-1 text-sm pt-4">
+            <div class="grid grid-cols-1 gap-1 text-[9pt] pt-2">
                 {{if .Nazionalita}}<p>🌍 {{.Nazionalita}}</p>{{end}}
                 {{if .Abitazione}}<p>📍 {{.Abitazione}}</p>{{end}}
                 {{if .Email}}<p>📧 <span class="break-all">{{.Email}}</span></p>{{end}}
                 {{if .Telefono}}<p>📞 <span class="break-all">{{.Telefono}}</span></p>{{end}}
-                {{if .Linkedin}}<p>🔗 <span class="break-all text-blue-700">{{.Linkedin}}</span></p>{{end}}
+                {{if .Linkedin}}<p>🔗 <span class="break-all text-blue-70">{{.Linkedin}}</span></p>{{end}}
                 </div>
-            </div>
-            <div class="separator-col"></div>
+                </div>
+                <div class="separator-col"></div>
+                {{ if .Esperienze }}<div class="content-col">
+                    <h2 class="section-title">Esperienza Professionale</h2>
+                    <div class="mt-2">
+                        {{ range $i, $exp := .Esperienze }}
+                        <div class="avoid-break {{if $i}}mt-4{{end}}">
+                            <p>
+                                <span class="font-bold text-[10pt] text-gray-800">{{$exp.Qualifica}}, </span>
+                                <span class="font-semibold text-[9pt] text-gray-600">{{$exp.DatoreLavoro}} - {{$exp.Luogo}}</span>
+                                <span class="text-[8pt] text-gray-500 uppercase">{{$exp.Periodo}}</span>
+                            </p>
+                
+                            <div class="prose max-w-none text-[9pt] mt-1 pl-3">
+                                {{ $exp.Descrizione }}
+                            </div>
+                        </div>
+                        {{ end }}
+                    </div>
+                </div>{{end}}
+                </div>
+                <!-- ALTRE SEZIONI DA MARKDOWN -->
+                {{ range $title, $content := .SezioniMarkdown }}
+                {{ if and (ne $title "Sommario") (ne $title "Principale") }}
+                <div class="cv-grid">
+                    <div class="label-col pt-8">
+                        <span class="section-title">{{$title}}</span>
+                    </div>
+                    <div class="separator-col"></div>
             <div class="content-col">
-                <div class="prose max-w-none 
-                                        [&_h2]:text-[10pt] [&_h2]:font-bold [&_h2]:text-[#004494] [&_h2]:uppercase [&_h2]:border-b [&_h2]:pb-1 [&_h2]:mt-2 [&_h2]:mb-4
-                                        [&_h3]:text-[9pt] [&_h3]:font-medium [&_h3]:text-gray-800 [&_h3]:mb-1
-                                        [&_h4]:text-[8pt] [&_h4]:ml-4 ">
-                    {{.Content}}
+                <div class="mt-8 prose whitespace-normal max-w-none text-[9pt]">
+                    {{ $content }}
                 </div>
             </div>
             </div>
+            {{ end }}
+            {{ end }}
             
-            <!-- <div class="cv-grid">
-                                                                                                                                                                                                                                                                                                                <div class="label-col">
-                                                                                                                                                                                                                                                                                                                </div>
-                                                                                                                                                                                                                                                                                                                <div class="separator-col"></div>
-                                                                                                                                                                                                                                                                                                        <div class="content-col">
-                                                                                                                                                                                                                                                                                                
+    {{ if .Istruzione }}
+    <div class="cv-grid">
+        <div class="label-col">
+            <h2 class="section-title">Istruzione e Formazione</h2>
         </div>
-    </div> -->
+        <div class="separator-col"></div>
+        <div class="content-col">
+            <div class="mt-8">
+                {{ range $i, $ist := .Istruzione }}
+                <div class="avoid-break {{if $i}}mt-4{{end}}">
+                    <p>
+                        <span class="font-bold text-[11pt] text-gray-800">{{$ist.Titolo}}, </span>
+                        <span class="font-semibold text-[10pt] text-gray-600">{{$ist.Istituto}} - {{$ist.Luogo}}</span>
+                        <span class="text-[8pt] text-gray-500 uppercase">{{$ist.Periodo}}</span>
+                    </p>
+                    <div class="prose whitespace-pre-line max-w-none text-[9pt] mt-1">{{ $ist.Descrizione }}</div>
+                </div>
+                {{ end }}
+                </div>
+                </div>
+                </div>
+                {{ end }}
 
     <div class="cv-grid avoid-break">
         <div class="label-col">
@@ -135,11 +176,13 @@
         <div class="content-col">
             <div class="mt-8"> {{range $area, $skills := .SkillsPerArea}}
                 <div class="mb-3">
-                    <span class="font-bold text-gray-700 uppercase text-[8pt] block">{{$area}}</span>
-                    <span class="text-gray-600">
-                        {{$length := len $skills}}{{range $i, $s := $skills}}{{$s}}{{if lt (add $i 1) $length}},
-                        {{end}}{{end}}
-                    </span>
+                    <div class="flex flex-row items-baseline ">
+                        <span class="font-bold text-gray-700 uppercase text-[9pt] block mr-2">{{$area}}: </span>
+                        <span class="text-gray-600 text-[9pt]">
+                            {{$length := len $skills}}{{range $i, $s := $skills}}{{$s}}{{if lt (add $i 1) $length}},
+                            {{end}}{{end}}
+                        </span>
+                    </div>
                 </div>
                 {{end}}
             </div>

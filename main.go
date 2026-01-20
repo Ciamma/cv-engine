@@ -2,18 +2,34 @@ package main
 
 import (
 	"bytes"
-	"fmt"
+	"encoding/json"
 	"flag"
+	"fmt"
 	"html/template"
 	"io"
 	"net/http"
 	"os"
 	"os/exec"
 	"strings"
+
 	"github.com/labstack/echo/v4"
 	"github.com/yuin/goldmark"
+	"github.com/yuin/goldmark/extension"
+	"github.com/yuin/goldmark/renderer/html"
 	"gopkg.in/yaml.v3"
 )
+
+// Convertitore Markdown configurato per rispettare gli "a capo"
+var mdConverter = goldmark.New(
+	goldmark.WithExtensions(
+		extension.HardBreaks,
+	),
+	goldmark.WithRendererOptions(
+		html.WithUnsafe(), // Permette l'uso di HTML grezzo nel Markdown
+	),
+)
+
+// --- STRUCTS ---
 
 type LivelliLingua struct {
 	Lingua          string `yaml:"lingua"`
@@ -24,28 +40,48 @@ type LivelliLingua struct {
 	Scrittura       string `yaml:"scrittura"`
 }
 
-// La struttura che ospiterà i tuoi dati
-type CVData struct {
-	Nome           string              `yaml:"nome"`
-	Cognome	       string              `yaml:"cognome"`
-	DataNascita    string              `yaml:"dataNascita"`
-	Sesso		   string              `yaml:"sesso"`
-	Posizione      string              `yaml:"posizione"`
-	Abitazione     string              `yaml:"abitazione"`
-	Email          string              `yaml:"email"`
-	Telefono       string              `yaml:"telefono"`
-	GitHub         string              `yaml:"github"`
-	Linkedin       string              `yaml:"linkedin"`
-	Nazionalita    string              `yaml:"nazionalita"`
-	TopSkills      []string            `yaml:"top_skills"`     // Quelle nell'header
-	LinguaMadre    string              `yaml:"lingua_madre"`
-	Lingue         []LivelliLingua     `yaml:"lingue"`
-	LingueSito     []string            `yaml:"lingueSito"`
-	SkillsPerArea  map[string][]string `yaml:"skills_per_area"` // Skill categorizzate
-	Content        template.HTML
+type Esperienza struct {
+	Qualifica     string        `yaml:"qualifica"`
+	DatoreLavoro  string        `yaml:"datore_lavoro"`
+	Periodo       string        `yaml:"periodo"`
+	Luogo         string        `yaml:"luogo"`
+	Descrizione   template.HTML `yaml:"-"`
+	DescrizioneMD string        `yaml:"descrizione"`
 }
 
-// Funzione per leggere e processare il file MD
+type Istruzione struct {
+	Titolo        string        `yaml:"titolo"`
+	Istituto      string        `yaml:"istituto"`
+	Periodo       string        `yaml:"periodo"`
+	Luogo         string        `yaml:"luogo"`
+	Descrizione   template.HTML `yaml:"-"`
+	DescrizioneMD string        `yaml:"descrizione"`
+}
+
+type CVData struct {
+	Nome            string                   `yaml:"nome"`
+	Cognome         string                   `yaml:"cognome"`
+	DataNascita     string                   `yaml:"dataNascita"`
+	Sesso           string                   `yaml:"sesso"`
+	Posizione       string                   `yaml:"posizione"`
+	Abitazione      string                   `yaml:"abitazione"`
+	Email           string                   `yaml:"email"`
+	Telefono        string                   `yaml:"telefono"`
+	GitHub          string                   `yaml:"github"`
+	Linkedin        string                   `yaml:"linkedin"`
+	Nazionalita     string                   `yaml:"nazionalita"`
+	TopSkills       []string                 `yaml:"top_skills"`
+	LinguaMadre     string                   `yaml:"lingua_madre"`
+	Lingue          []LivelliLingua          `yaml:"lingue"`
+	LingueSito      []string                 `yaml:"lingueSito"`
+	SkillsPerArea   map[string][]string      `yaml:"skills_per_area"`
+	Esperienze      []Esperienza             `yaml:"esperienze"`
+	Istruzione      []Istruzione             `yaml:"istruzione"`
+	SezioniMarkdown map[string]template.HTML `yaml:"-"`
+}
+
+// --- LOGICA DI CARICAMENTO ---
+
 func loadCV() (CVData, error) {
 	file, err := os.ReadFile("data/cv.md")
 	if err != nil {
@@ -53,22 +89,91 @@ func loadCV() (CVData, error) {
 	}
 
 	parts := strings.SplitN(string(file), "---", 3)
-	
-	var data CVData
-	yaml.Unmarshal([]byte(parts[1]), &data)
+	if len(parts) < 3 {
+		return CVData{}, fmt.Errorf("file 'data/cv.md' non contiene un front matter YAML valido racchiuso da '---'")
+	}
 
-	var buf bytes.Buffer
-	goldmark.Convert([]byte(parts[2]), &buf)
-	data.Content = template.HTML(buf.String())
+	var data CVData
+	if err := yaml.Unmarshal([]byte(parts[1]), &data); err != nil {
+		return CVData{}, fmt.Errorf("errore nel parsing del YAML: %w", err)
+	}
+
+	mdToHTML := func(md string) template.HTML {
+		var buf bytes.Buffer
+		if err := mdConverter.Convert([]byte(md), &buf); err != nil {
+			fmt.Printf("Errore conversione Markdown: %v\n", err)
+			return template.HTML("Errore conversione Markdown")
+		}
+		return template.HTML(buf.String())
+	}
+
+	for i := range data.Esperienze {
+		data.Esperienze[i].Descrizione = mdToHTML(data.Esperienze[i].DescrizioneMD)
+	}
+
+	for i := range data.Istruzione {
+		data.Istruzione[i].Descrizione = mdToHTML(data.Istruzione[i].DescrizioneMD)
+	}
+
+	data.SezioniMarkdown = make(map[string]template.HTML)
+	markdownBody := strings.TrimSpace(parts[2])
+
+	if markdownBody != "" {
+		const delimiter = "\n## "
+		if !strings.HasPrefix(markdownBody, "## ") {
+			lines := strings.SplitN(markdownBody, delimiter, 2)
+			data.SezioniMarkdown["Principale"] = mdToHTML(lines[0])
+			if len(lines) > 1 {
+				markdownBody = lines[1]
+			} else {
+				markdownBody = ""
+			}
+		}
+
+		// Rimuovi il primo elemento vuoto se il corpo inizia con il delimitatore
+		if strings.HasPrefix(markdownBody, "## ") {
+			markdownBody = strings.TrimPrefix(markdownBody, "## ")
+		}
+		
+		sections := strings.Split(markdownBody, delimiter)
+		for _, section := range sections {
+			section = strings.TrimSpace(section)
+			if section == "" {
+				continue
+			}
+
+			lines := strings.SplitN(section, "\n", 2)
+			title := strings.TrimSpace(lines[0])
+			content := ""
+			if len(lines) > 1 {
+				content = lines[1]
+			}
+
+			if title != "" {
+				data.SezioniMarkdown[title] = mdToHTML(content)
+			}
+		}
+	}
+
+	// Debug: Stampa la struttura dati in formato JSON
+	jsonData, err := json.MarshalIndent(data, "", "  ")
+	if err != nil {
+		fmt.Println("Errore nel marshalling JSON per il debug:", err)
+	} else {
+		fmt.Println("---", "INIZIO DEBUG DATI CV", "---")
+		fmt.Println(string(jsonData))
+		fmt.Println("---", "FINE DEBUG DATI CV", "---")
+	}
 
 	return data, nil
 }
 
 func (c CVData) NomeCompleto() string {
-    return c.Nome + " " + c.Cognome
+	return c.Nome + " " + c.Cognome
 }
 
-// Renderer per Echo
+// --- RESTO DEL FILE ---
+
 type TemplateRenderer struct {
 	templates *template.Template
 }
@@ -107,17 +212,14 @@ func exportStatic() {
 }
 
 func main() {
-	// 1. Definiamo il flag -export
 	exportMode := flag.Bool("export", false, "Esegue l'esportazione statica e termina")
 	flag.Parse()
 
-	// 2. Se il flag è presente, eseguiamo l'export e USCIAMO
 	if *exportMode {
 		exportStatic()
 		return
 	}
 
-	// 3. Altrimenti, avviamo il server normalmente per lo sviluppo locale
 	e := echo.New()
 
 	renderer := &TemplateRenderer{
@@ -136,13 +238,17 @@ func main() {
 
 	e.GET("/", func(c echo.Context) error {
 		cv, err := loadCV()
-		if err != nil { return err }
+		if err != nil {
+			return c.String(http.StatusInternalServerError, err.Error())
+		}
 		return c.Render(http.StatusOK, "index.html", cv)
 	})
 
 	e.GET("/pdf", func(c echo.Context) error {
 		cv, err := loadCV()
-		if err != nil { return err }
+		if err != nil {
+			return c.String(http.StatusInternalServerError, err.Error())
+		}
 		return c.Render(http.StatusOK, "pdf.html", cv)
 	})
 
