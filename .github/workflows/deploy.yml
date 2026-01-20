@@ -25,9 +25,27 @@ jobs:
           go-version: '1.24'
           cache: false
 
+      - name: DEBUG - Inspect Environment
+        run: |
+          echo "--- Go Version ---"
+          go version
+          echo "--- Directory Listing ---"
+          ls -R
+          echo "--- go.mod ---"
+          cat go.mod
+          echo "--- main.go ---"
+          cat main.go
+          
+      - name: DEBUG - Check Go Modules
+        run: |
+          echo "Running 'go mod tidy'..."
+          go mod tidy
+          echo "--- Final Goldmark dependency ---"
+          go list -m all | grep "goldmark"
+
       - name: Build Static Site
         run: |
-          go mod tidy
+          echo "Running 'go run main.go'..."
           go run main.go -export
 
       # NUOVA PROCEDURA PER IL PDF
