@@ -11,21 +11,18 @@ import (
 	"os"
 	"os/exec"
 	"strings"
-	
+
 	"github.com/labstack/echo/v4"
 	"github.com/yuin/goldmark"
-	"github.com/yuin/goldmark/extension"
 	"github.com/yuin/goldmark/renderer/html"
 	"gopkg.in/yaml.v3"
 )
 
-// Convertitore Markdown configurato per rispettare gli "a capo"
+// Convertitore Markdown configurato correttamente
 var mdConverter = goldmark.New(
-	goldmark.WithExtensions(
-		extension.HardBreaks,
-	),
 	goldmark.WithRendererOptions(
-		html.WithUnsafe(), // Permette l'uso di HTML grezzo nel Markdown
+		html.WithHardWraps(), // Questo è il modo corretto per abilitare gli "a capo"
+		html.WithUnsafe(),   // Permette l'uso di HTML grezzo nel Markdown
 	),
 )
 
@@ -130,11 +127,10 @@ func loadCV() (CVData, error) {
 			}
 		}
 
-		// Rimuovi il primo elemento vuoto se il corpo inizia con il delimitatore
 		if strings.HasPrefix(markdownBody, "## ") {
 			markdownBody = strings.TrimPrefix(markdownBody, "## ")
 		}
-		
+
 		sections := strings.Split(markdownBody, delimiter)
 		for _, section := range sections {
 			section = strings.TrimSpace(section)
@@ -160,9 +156,9 @@ func loadCV() (CVData, error) {
 	if err != nil {
 		fmt.Println("Errore nel marshalling JSON per il debug:", err)
 	} else {
-		fmt.Println("---", "INIZIO DEBUG DATI CV", "---")
+		fmt.Println("--- INIZIO DEBUG DATI CV ---")
 		fmt.Println(string(jsonData))
-		fmt.Println("---", "FINE DEBUG DATI CV", "---")
+		fmt.Println("--- FINE DEBUG DATI CV ---")
 	}
 
 	return data, nil
