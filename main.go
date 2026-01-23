@@ -150,7 +150,7 @@ func loadCV() (CVData, error) {
 		}
 	}
 
-	jsonData, err := json.MarshalIndent(data, "", "  ")
+	//jsonData, err := json.MarshalIndent(data, "", "  ")
 	if err != nil {
 		fmt.Println("Errore nel marshalling JSON per il debug:", err)
 	} else {
