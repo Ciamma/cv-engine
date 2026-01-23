@@ -26,6 +26,7 @@
         }
     </style>
     <title>{{.Nome}} - Curriculum</title>
+    <script defer src="https://cloud.umami.is/script.js" data-website-id="4a8c940e-a4ad-43ef-ab19-cfb97272a362"></script>
 </head>
 
 <body class="bg-slate-50 font-sans antialiased text-gray-900">
@@ -199,7 +200,7 @@
         
         <div class="fixed bottom-6 right-6 z-40">
             <a href="curriculum.pdf" download="CV_{{.Nome}}_{{.Cognome}}.pdf" id="download-btn"
-                class="group flex items-center gap-3 bg-slate-900 text-white p-4 md:px-8 md:py-4 rounded-full font-bold shadow-2xl hover:bg-blue-600 transition-all duration-300 transform hover:-translate-y-1 active:scale-95">
+                class="umami--click--download-pdf group flex items-center gap-3 bg-slate-900 text-white p-4 md:px-8 md:py-4 rounded-full font-bold shadow-2xl hover:bg-blue-600 transition-all duration-300 transform hover:-translate-y-1 active:scale-95">
                 <span class="text-xl">⬇️</span>
                 <span class="hidden md:inline">Scarica PDF</span>
             </a>
@@ -275,8 +276,7 @@
             hideToast();
             if (toastTimeout) clearTimeout(toastTimeout);
         });
-    </script>
-
+</script>
 </body>
 
 </html>
