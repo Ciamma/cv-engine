@@ -24,24 +24,11 @@ jobs:
         with:
           go-version: '1.24'
           cache: false
-
-      - name: DEBUG - Inspect Environment
-        run: |
-          echo "--- Go Version ---"
-          go version
-          echo "--- Directory Listing ---"
-          ls -R
-          echo "--- go.mod ---"
-          cat go.mod
-          echo "--- main.go ---"
-          cat main.go
           
       - name: DEBUG - Check Go Modules
         run: |
           echo "Running 'go mod tidy'..."
           go mod tidy
-          echo "--- Final Goldmark dependency ---"
-          go list -m all | grep "goldmark"
 
       - name: Build Static Site
         run: |
@@ -58,8 +45,14 @@ jobs:
         run: npm install pagedjs-cli --no-package-lock
 
       - name: Generate PDF
-        # Usiamo --no-sandbox perché siamo in un container Docker/GitHub Action
         run: npx pagedjs-cli dist/pdf.html -o dist/curriculum.pdf --browserArgs --no-sandbox
+
+      - name: Encrypt PDF and Clean Up
+        run: |
+          sudo apt-get update && sudo apt-get install -y qpdf
+          qpdf --encrypt "${{ secrets.PDF_PASSWORD }}" "${{ secrets.PDF_PASSWORD }}" 256 -- dist/curriculum.pdf dist/curriculum-encrypted.pdf
+          mv dist/curriculum-encrypted.pdf dist/curriculum.pdf
+          rm dist/pdf.html
 
       - name: Upload Artifact
         uses: actions/upload-pages-artifact@v3

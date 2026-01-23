@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="static/style.css">
     <style>
         .prose ul {
             list-style-type: disc;
@@ -131,7 +132,7 @@
                     <!-- <div class="prose prose-slate whitespace-line max-w-none text-slate-600 leading-relaxed pl-3">
                                         {{ .Descrizione }}
                                     </div> -->
-                    <div class="prose whitespace-pre-line max-w-none mt-1 pl-3">{{ .Descrizione }}</div>
+                    <div class="prose max-w-none mt-1 pl-3">{{ .Descrizione }}</div>
                 </div>
                 {{ end }}
             </div>
@@ -189,18 +190,92 @@
             </div>
         </section>
 
-        <div class="flex justify-center pt-6">
-            <a href="curriculum.pdf" download="CV_{{.Nome}}_{{.Cognome}}.pdf"
+        <!-- <div class="flex justify-center pt-6">
+                                            <a href="curriculum.pdf" download="CV_{{.Nome}}_{{.Cognome}}.pdf" id="download-btn"
                 class="group relative flex items-center gap-3 bg-slate-900 text-white px-8 py-4 rounded-full font-bold shadow-xl hover:bg-blue-600 transition-all duration-300 transform hover:-translate-y-1">
                 ⬇️ Scarica Curriculum PDF
             </a>
+        </div> -->
+        
+        <div class="fixed bottom-6 right-6 z-40">
+            <a href="curriculum.pdf" download="CV_{{.Nome}}_{{.Cognome}}.pdf" id="download-btn"
+                class="group flex items-center gap-3 bg-slate-900 text-white p-4 md:px-8 md:py-4 rounded-full font-bold shadow-2xl hover:bg-blue-600 transition-all duration-300 transform hover:-translate-y-1 active:scale-95">
+                <span class="text-xl">⬇️</span>
+                <span class="hidden md:inline">Scarica PDF</span>
+            </a>
+        </div>
+        
+        <div id="toast" class="hidden fixed top-5 right-2 z-50 w-full max-w-sm cursor-pointer px-4 sm:px-0">
+            <div
+                class="bg-slate-900/95 backdrop-blur-sm text-white p-4 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] flex items-center gap-4 border border-slate-700 hover:border-blue-500 transition-all duration-300 group">
+        
+                <div class="bg-[#0077b5] p-2.5 rounded-xl group-hover:scale-110 transition-transform duration-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" class="fill-white">
+                        <path
+                            d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
+                    </svg>
+                </div>
+        
+                <div class="flex-1">
+                    <h4 class="font-bold text-white text-base tracking-wide uppercase text-[9pt]">File Protetto</h4>
+                    <p class="text-slate-400 text-sm leading-snug">Scrivimi su <span
+                            class="text-blue-400 font-semibold">LinkedIn</span> per la password.</p>
+                </div>
+        
+                <div
+                    class="flex items-center justify-center h-8 w-8 rounded-full bg-slate-800 group-hover:bg-blue-600 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400 group-hover:text-white" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                </div>
+            </div>
         </div>
 
     </main>
+    
+
 
     <footer class="text-center py-10 text-slate-400 text-xs">
         Generato con Go + Tailwind CSS • 2026
     </footer>
+
+    <script>
+        const downloadBtn = document.getElementById('download-btn');
+        const toast = document.getElementById('toast');
+        let toastTimeout;
+
+        downloadBtn.addEventListener('click', (e) => {
+            // Reset se già visibile
+            if (toastTimeout) clearTimeout(toastTimeout);
+
+            toast.classList.remove('hidden', 'toast-out');
+            toast.classList.add('toast-in');
+
+            toastTimeout = setTimeout(() => {
+                hideToast();
+            }, 15000);
+        });
+
+        function hideToast() {
+            toast.classList.remove('toast-in');
+            toast.classList.add('toast-out');
+            // Aspetta la fine dell'animazione per nascondere il DOM
+            setTimeout(() => {
+                if (toast.classList.contains('toast-out')) {
+                    toast.classList.add('hidden');
+                }
+            }, 500);
+        }
+
+        toast.addEventListener('click', () => {
+            // Apri LinkedIn
+            window.open("{{.Linkedin}}", "_blank");
+            // Chiudi il toast
+            hideToast();
+            if (toastTimeout) clearTimeout(toastTimeout);
+        });
+    </script>
 
 </body>
 

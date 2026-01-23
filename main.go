@@ -18,11 +18,10 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// Convertitore Markdown configurato correttamente
 var mdConverter = goldmark.New(
 	goldmark.WithRendererOptions(
-		html.WithHardWraps(), // Questo è il modo corretto per abilitare gli "a capo"
-		html.WithUnsafe(),   // Permette l'uso di HTML grezzo nel Markdown
+		html.WithHardWraps(),
+		html.WithUnsafe(),
 	),
 )
 
@@ -151,14 +150,13 @@ func loadCV() (CVData, error) {
 		}
 	}
 
-	// Debug: Stampa la struttura dati in formato JSON
 	jsonData, err := json.MarshalIndent(data, "", "  ")
 	if err != nil {
 		fmt.Println("Errore nel marshalling JSON per il debug:", err)
 	} else {
-		fmt.Println("--- INIZIO DEBUG DATI CV ---")
-		fmt.Println(string(jsonData))
-		fmt.Println("--- FINE DEBUG DATI CV ---")
+		//fmt.Println("--- INIZIO DEBUG DATI CV ---")
+		//fmt.Println(string(jsonData))
+		//fmt.Println("--- FINE DEBUG DATI CV ---")
 	}
 
 	return data, nil
@@ -240,13 +238,13 @@ func main() {
 		return c.Render(http.StatusOK, "index.html", cv)
 	})
 
-	e.GET("/pdf", func(c echo.Context) error {
-		cv, err := loadCV()
-		if err != nil {
-			return c.String(http.StatusInternalServerError, err.Error())
-		}
-		return c.Render(http.StatusOK, "pdf.html", cv)
-	})
+	// e.GET("/pdf", func(c echo.Context) error {
+	// 	cv, err := loadCV()
+	// 	if err != nil {
+	// 		return c.String(http.StatusInternalServerError, err.Error())
+	// 	}
+	// 	return c.Render(http.StatusOK, "pdf.html", cv)
+	// })
 
 	e.Logger.Fatal(e.Start(":8080"))
 }
