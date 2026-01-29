@@ -125,8 +125,8 @@ func loadCV() (CVData, error) {
 			}
 		}
 
-		if strings.HasPrefix(markdownBody, "## ") {
-			markdownBody = strings.TrimPrefix(markdownBody, "## ")
+		if after, ok := strings.CutPrefix(markdownBody, "## "); ok {
+			markdownBody = after
 		}
 
 		sections := strings.Split(markdownBody, delimiter)
@@ -237,13 +237,13 @@ func main() {
 		return c.Render(http.StatusOK, "index.html", cv)
 	})
 
-	// e.GET("/pdf", func(c echo.Context) error {
-	// 	cv, err := loadCV()
-	// 	if err != nil {
-	// 		return c.String(http.StatusInternalServerError, err.Error())
-	// 	}
-	// 	return c.Render(http.StatusOK, "pdf.html", cv)
-	// })
+	e.GET("/pdf", func(c echo.Context) error {
+		cv, err := loadCV()
+		if err != nil {
+			return c.String(http.StatusInternalServerError, err.Error())
+		}
+		return c.Render(http.StatusOK, "pdf.html", cv)
+	})
 
 	e.Logger.Fatal(e.Start(":8080"))
 }

@@ -4,6 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="og:title" content="Daniele | Software Engineer CV">
+    <meta property="og:description"
+        content="Esplora il mio curriculum">
+    <meta property="og:url" content="https://ciamma.github.io">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="static/style.css">
     <style>
@@ -12,13 +16,13 @@
             margin-left: 1.2rem;
             margin-top: 0.5rem;
         }
-    
+
         .prose li {
             margin-bottom: 0.2rem;
             padding-left: 0.3rem;
             font-size: 8pt;
         }
-    
+
         .prose h3 {
             margin-top: 1rem;
             color: #111;
@@ -26,7 +30,8 @@
         }
     </style>
     <title>{{.Nome}} - Curriculum</title>
-    <script defer src="https://cloud.umami.is/script.js" data-website-id="4a8c940e-a4ad-43ef-ab19-cfb97272a362"></script>
+    <script defer src="https://cloud.umami.is/script.js"
+        data-website-id="4a8c940e-a4ad-43ef-ab19-cfb97272a362"></script>
 </head>
 
 <body class="bg-slate-50 font-sans antialiased text-gray-900">
@@ -43,7 +48,7 @@
 
             <div class="flex flex-col items-center md:items-end gap-1 text-sm text-slate-600 font-medium">
                 <div class="flex flex-col items-center md:items-end gap-3 md:gap-0">
-                    <span class="flex items-center gap-1">📍 {{.Nazionalita}}</span>
+                    {{if .Nazionalita}}<span class="flex items-center gap-1">🌍 {{.Nazionalita}}</span>{{end}}
                     <div>
                         {{range .LingueSito}}
                         <span class="text-slate-400 italic">🗣️ {{.}}</span>
@@ -57,7 +62,6 @@
             </div>
         </div>
         <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col justify-between items-center gap-2">
-            <!-- <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 md:p-8"> -->
             <h4 class="text-lg font-bold text-slate-800 flex items-center gap-2">
                 🚀 Top Skills
             </h4>
@@ -69,7 +73,6 @@
                 </span>
                 {{end}}
             </div>
-            <!-- </section> -->
         </div>
     </header>
 
@@ -82,22 +85,36 @@
             <article class="max-w-none text-slate-700 leading-relaxed prose prose-slate">
                 {{ . }}
             </article>
-            </section>
-            {{ end }}
-        
+        </section>
+        {{ end }}
+
         <!-- Sezione Esperienze (da YAML) -->
         {{ if .Esperienze }}
         <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 md:p-8">
-            <h2 class="text-2xl font-bold text-slate-800 mb-6 border-b pb-2">Esperienza Professionale</h2>
-            <div class="space-y-4">
+            <h2 class="text-2xl font-bold text-slate-800 mb-8 border-b pb-2">Esperienza Professionale</h2>
+
+            <div class="relative border-l-2 border-slate-200 ml-3 space-y-4 pb-1">
                 {{ range .Esperienze }}
-                <div class="group">
-                    <p>
-                        <span class="text-lg font-semibold text-blue-600">{{ .Qualifica }}, </span>
-                        <span class="text-md font-medium text-slate-700">{{ .DatoreLavoro }} · {{ .Luogo }}</span>
-                        <span class="text-sm text-slate-500 mb-2">{{ .Periodo }}</span>
-                    </p>
-                    <div class="prose prose-slate max-w-none text-slate-600 leading-relaxed pl-3">
+                <div class="relative pl-8 group">
+                    <div
+                        class="absolute -left-[9px] top-1.5 w-4 h-4 rounded-full border-2 border-white bg-slate-300 group-hover:bg-blue-600 group-hover:scale-125 transition-all duration-200">
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row sm:items-baseline sm:justify-between mb-1">
+                        <span class="text-lg font-medium text-blue-600 group-hover:text-blue-700 transition-colors">
+                            {{ .Qualifica }}
+                        </span>
+                        <span class="text-xs font-semibold tracking-wide uppercase text-slate-400 sm:ml-4">
+                            {{ .Periodo }}
+                        </span>
+                    </div>
+
+                    <div class="text-base font-medium text-slate-700 mb-2">
+                        {{ .DatoreLavoro }} · <span class="text-slate-500">{{ .Luogo }}</span>
+                    </div>
+
+                    <div
+                        class="prose prose-sm prose-slate max-w-none text-slate-600 leading-relaxed text-sm italic border-l-2 border-slate-50 pl-4">
                         {{ .Descrizione }}
                     </div>
                 </div>
@@ -105,7 +122,7 @@
             </div>
         </section>
         {{ end }}
-        
+
         <!-- Altre sezioni dal Markdown -->
         {{ range $title, $content := .SezioniMarkdown }}
         {{ if and (ne $title "Sommario") (ne $title "Principale") }}
@@ -117,28 +134,41 @@
         </section>
         {{ end }}
         {{ end }}
-        
+
         <!-- Sezione Istruzione (da YAML) -->
         {{ if .Istruzione }}
         <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 md:p-8">
-            <h2 class="text-2xl font-bold text-slate-800 mb-6 border-b pb-2">Istruzione e Formazione</h2>
-            <div class="space-y-4">
+            <h2 class="text-2xl font-bold text-slate-800 mb-8 border-b pb-2">Istruzione e Formazione</h2>
+
+            <div class="relative border-l-2 border-slate-200 ml-3 space-y-4 pb-1">
                 {{ range .Istruzione }}
-                <div>
-                    <p>
-                        <span class="text-lg font-semibold text-blue-600">{{ .Titolo }}, </span>
-                        <span class="text-md font-medium text-slate-700">{{ .Istituto }} · {{ .Luogo }}</span>
-                        <span class="text-sm text-slate-500 mb-2">{{ .Periodo }}</span>
-                    </p>
-                    <!-- <div class="prose prose-slate whitespace-line max-w-none text-slate-600 leading-relaxed pl-3">
-                                        {{ .Descrizione }}
-                                    </div> -->
-                    <div class="prose max-w-none mt-1 pl-3">{{ .Descrizione }}</div>
+                <div class="relative pl-8 group">
+                    <div
+                        class="absolute -left-[9px] top-1.5 w-4 h-4 rounded-full border-2 border-white bg-slate-300 group-hover:bg-blue-600 group-hover:scale-125 transition-all duration-200">
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row sm:items-baseline sm:justify-between mb-1">
+                        <span class="text-lg font-medium text-blue-600 group-hover:text-blue-700 transition-colors">
+                            {{ .Titolo }}
+                        </span>
+                        <span class="text-xs font-semibold tracking-wide uppercase text-slate-400 sm:ml-4">
+                            {{ .Periodo }}
+                        </span>
+                    </div>
+
+                    <div class="text-base font-medium text-slate-700 mb-2">
+                        {{ .Istituto }} · <span class="text-slate-500">{{ .Luogo }}</span>
+                    </div>
+
+                    <div
+                        class="prose prose-sm prose-slate max-w-none text-slate-600 leading-relaxed text-sm italic border-l-2 border-slate-50 pl-4">
+                        {{ .Descrizione }}
+                    </div>
                 </div>
                 {{ end }}
             </div>
         </section>
-            {{ end }}
+        {{ end }}
 
         <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 md:p-8">
             <h2 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2 border-b pb-2">
@@ -197,7 +227,7 @@
                 ⬇️ Scarica Curriculum PDF
             </a>
         </div> -->
-        
+
         <div class="fixed bottom-6 right-6 z-40">
             <a href="curriculum.pdf" download="CV_{{.Nome}}_{{.Cognome}}.pdf" id="download-btn"
                 class="umami--click--download-pdf group flex items-center gap-3 bg-slate-900 text-white p-4 md:px-8 md:py-4 rounded-full font-bold shadow-2xl hover:bg-blue-600 transition-all duration-300 transform hover:-translate-y-1 active:scale-95">
@@ -205,28 +235,29 @@
                 <span class="hidden md:inline">Scarica PDF</span>
             </a>
         </div>
-        
+
         <div id="toast" class="hidden fixed top-5 right-2 z-50 w-full max-w-sm cursor-pointer px-4 sm:px-0">
             <div
                 class="bg-slate-900/95 backdrop-blur-sm text-white p-4 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] flex items-center gap-4 border border-slate-700 hover:border-blue-500 transition-all duration-300 group">
-        
+
                 <div class="bg-[#0077b5] p-2.5 rounded-xl group-hover:scale-110 transition-transform duration-300">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" class="fill-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"
+                        class="fill-white">
                         <path
                             d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
                     </svg>
                 </div>
-        
+
                 <div class="flex-1">
                     <h4 class="font-bold text-white text-base tracking-wide uppercase text-[9pt]">File Protetto</h4>
                     <p class="text-slate-400 text-sm leading-snug">Scrivimi su <span
                             class="text-blue-400 font-semibold">LinkedIn</span> per la password.</p>
                 </div>
-        
+
                 <div
                     class="flex items-center justify-center h-8 w-8 rounded-full bg-slate-800 group-hover:bg-blue-600 transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400 group-hover:text-white" fill="none"
-                        viewBox="0 0 24 24" stroke="currentColor">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400 group-hover:text-white"
+                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                     </svg>
                 </div>
@@ -234,7 +265,7 @@
         </div>
 
     </main>
-    
+
 
 
     <footer class="text-center py-10 text-slate-400 text-xs">
@@ -276,7 +307,7 @@
             hideToast();
             if (toastTimeout) clearTimeout(toastTimeout);
         });
-</script>
+    </script>
 </body>
 
 </html>

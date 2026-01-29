@@ -106,45 +106,55 @@
                 {{if .Email}}<p>📧 <span class="break-all">{{.Email}}</span></p>{{end}}
                 {{if .Telefono}}<p>📞 <span class="break-all">{{.Telefono}}</span></p>{{end}}
                 {{if .Linkedin}}<p>🔗 <span class="break-all text-blue-70">{{.Linkedin}}</span></p>{{end}}
-                </div>
-                </div>
-                <div class="separator-col"></div>
-                {{ if .Esperienze }}<div class="content-col">
-                    <h2 class="section-title">Esperienza Professionale</h2>
-                    <div class="mt-2">
-                        {{ range $i, $exp := .Esperienze }}
-                        <div class="avoid-break {{if $i}}mt-4{{end}}">
-                            <p>
-                                <span class="font-bold text-[10pt] text-gray-800">{{$exp.Qualifica}}, </span>
-                                <span class="font-semibold text-[9pt] text-gray-600">{{$exp.DatoreLavoro}} - {{$exp.Luogo}}</span>
-                                <span class="text-[8pt] text-gray-500 uppercase">{{$exp.Periodo}}</span>
-                            </p>
-                
-                            <div class="prose max-w-none text-[9pt] mt-1 pl-3">
-                                {{ $exp.Descrizione }}
-                            </div>
-                        </div>
-                        {{ end }}
-                    </div>
-                </div>{{end}}
-                </div>
-                <!-- ALTRE SEZIONI DA MARKDOWN -->
-                {{ range $title, $content := .SezioniMarkdown }}
-                {{ if and (ne $title "Sommario") (ne $title "Principale") }}
-                <div class="cv-grid">
-                    <div class="label-col pt-8">
-                        <span class="section-title">{{$title}}</span>
-                    </div>
-                    <div class="separator-col"></div>
-            <div class="content-col">
-                <div class="mt-8 prose whitespace-normal max-w-none text-[9pt]">
-                    {{ $content }}
-                </div>
             </div>
+        </div>
+        <div class="separator-col"></div>
+        {{ if .Esperienze }}
+        <div class="content-col">
+            <h2 class="section-title">Esperienza Professionale</h2>
+
+            <div class="mt-4 ml-2 border-l-[1.5pt] border-gray-200">
+                {{ range $i, $exp := .Esperienze }}
+                <div class="avoid-break relative pl-6 {{if $i}}mt-4{{else}}mt-2{{end}}">
+
+                    <div style="background-color: #004494;"
+                        class="absolute -left-[5.5pt] top-[2pt] w-[10pt] h-[10pt] rounded-full border-[2pt] border-white">
+                    </div>
+
+                    <p class="leading-tight">
+                        <span class="font-bold text-[10pt] text-gray-800">{{$exp.Qualifica}}, </span>
+                        <span class="font-semibold text-[9pt] text-gray-600">{{$exp.DatoreLavoro}} -
+                            {{$exp.Luogo}}</span>
+                        <br>
+                        <span class="text-[8pt] text-gray-500 uppercase font-medium">{{$exp.Periodo}}</span>
+                    </p>
+
+                    <div class="prose max-w-none text-[9pt] mt-2 text-gray-700">
+                        {{ $exp.Descrizione }}
+                    </div>
+                </div>
+                {{ end }}
             </div>
-            {{ end }}
-            {{ end }}
-            
+        </div>
+        {{ end }}
+    </div>
+    <!-- ALTRE SEZIONI DA MARKDOWN -->
+    {{ range $title, $content := .SezioniMarkdown }}
+    {{ if and (ne $title "Sommario") (ne $title "Principale") }}
+    <div class="cv-grid">
+        <div class="label-col pt-8">
+            <span class="section-title">{{$title}}</span>
+        </div>
+        <div class="separator-col"></div>
+        <div class="content-col">
+            <div class="mt-8 prose whitespace-normal max-w-none text-[9pt]">
+                {{ $content }}
+            </div>
+        </div>
+    </div>
+    {{ end }}
+    {{ end }}
+
     {{ if .Istruzione }}
     <div class="cv-grid">
         <div class="label-col">
@@ -152,21 +162,31 @@
         </div>
         <div class="separator-col"></div>
         <div class="content-col">
-            <div class="mt-8">
+            <div class="mt-8 ml-2 border-l-[1.5pt] border-gray-200">
                 {{ range $i, $ist := .Istruzione }}
-                <div class="avoid-break {{if $i}}mt-4{{end}}">
-                    <p>
+                <div class="avoid-break relative pl-6 {{if $i}}mt-6{{else}}mt-2{{end}}">
+
+                    <div style="background-color: #004494;"
+                        class="absolute -left-[5.5pt] top-[2pt] w-[10pt] h-[10pt] rounded-full border-[2pt] border-white">
+                    </div>
+
+                    <p class="leading-tight">
                         <span class="font-bold text-[11pt] text-gray-800">{{$ist.Titolo}}, </span>
                         <span class="font-semibold text-[10pt] text-gray-600">{{$ist.Istituto}} - {{$ist.Luogo}}</span>
-                        <span class="text-[8pt] text-gray-500 uppercase">{{$ist.Periodo}}</span>
+                        <br>
+                        <span class="text-[8pt] text-gray-500 uppercase font-medium">{{$ist.Periodo}}</span>
                     </p>
-                    <div class="prose whitespace-pre-line max-w-none text-[9pt] mt-1">{{ $ist.Descrizione }}</div>
+
+                    <div
+                        class="prose max-w-none text-[9pt] mt-2 text-gray-700 italic border-l-2 border-gray-50 pl-4">
+                        {{ $ist.Descrizione }}
+                    </div>
                 </div>
                 {{ end }}
-                </div>
-                </div>
-                </div>
-                {{ end }}
+            </div>
+        </div>
+    </div>
+    {{ end }}
 
     <div class="cv-grid avoid-break">
         <div class="label-col">
@@ -218,7 +238,7 @@
                 {{end}}
                 <p class="text-[7pt] text-gray-400 mt-1 italic">Livelli: A1/2: Base - B1/2: Intermedio - C1/2: Avanzato
                 </p>
-                </div>
+            </div>
         </div>
     </div>
 </body>
